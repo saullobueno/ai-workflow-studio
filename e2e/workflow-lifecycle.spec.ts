@@ -7,7 +7,10 @@ test.beforeEach(async ({ page }) => {
 test('cria o workflow de exemplo, executa e vê o histórico', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: /começar com o exemplo/i }).click()
+  await page.getByRole('combobox', { name: /começar com um exemplo/i }).click()
+  await page
+    .getByRole('option', { name: 'Ticket VIP com sentimento negativo' })
+    .click()
 
   await expect(page).toHaveURL(/\/workflows\//)
   await expect(page.getByText('Novo ticket de suporte')).toBeVisible()
@@ -50,7 +53,10 @@ test('cria um workflow em branco, adiciona um node pela paleta e configura', asy
 test('abre a command palette com Ctrl+K e executa uma ação', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: /começar com o exemplo/i }).click()
+  await page.getByRole('combobox', { name: /começar com um exemplo/i }).click()
+  await page
+    .getByRole('option', { name: 'Ticket VIP com sentimento negativo' })
+    .click()
   await expect(page).toHaveURL(/\/workflows\//)
 
   await page.keyboard.press('Control+k')

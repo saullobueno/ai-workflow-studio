@@ -19,3 +19,9 @@ globalThis.ResizeObserver = ResizeObserverMock
 // jsdom também não implementa scrollIntoView, usado pelo cmdk (command
 // palette) para rolar até o item destacado.
 Element.prototype.scrollIntoView = vi.fn()
+
+// jsdom também não implementa a API de Pointer Capture, usada pelo Radix
+// Select (e outros primitivos baseados em ponteiro) para abrir/fechar.
+Element.prototype.hasPointerCapture = vi.fn(() => false)
+Element.prototype.setPointerCapture = vi.fn()
+Element.prototype.releasePointerCapture = vi.fn()

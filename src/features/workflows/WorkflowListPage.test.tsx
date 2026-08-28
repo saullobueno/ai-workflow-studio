@@ -50,12 +50,36 @@ describe('WorkflowListPage', () => {
     expect(await screen.findByText('Editor aberto')).toBeInTheDocument()
   })
 
-  it('cria o workflow a partir do template do ticket VIP', async () => {
+  it('lista os 5 exemplos no seletor de templates', async () => {
     const user = userEvent.setup()
     renderPage()
 
     await user.click(
-      screen.getByRole('button', { name: /começar com o exemplo/i }),
+      screen.getByRole('combobox', { name: /começar com um exemplo/i }),
+    )
+
+    for (const label of [
+      'Ticket VIP com sentimento negativo',
+      'Aprovação de despesa corporativa',
+      'Lançamento de produto (multi-canal)',
+      'Review negativo vira tarefa',
+      'Lembrete de pagamento em atraso',
+    ]) {
+      expect(screen.getByRole('option', { name: label })).toBeInTheDocument()
+    }
+  })
+
+  it('cria o workflow a partir do template escolhido no seletor', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await user.click(
+      screen.getByRole('combobox', { name: /começar com um exemplo/i }),
+    )
+    await user.click(
+      screen.getByRole('option', {
+        name: 'Lançamento de produto (multi-canal)',
+      }),
     )
 
     expect(await screen.findByText('Editor aberto')).toBeInTheDocument()

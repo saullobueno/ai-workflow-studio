@@ -11,8 +11,15 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/design/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/design/ui/select'
 import { CopilotDialog } from '@/features/copilot/CopilotDialog'
-import { buildVipTicketTemplate } from '@/features/workflows/starter-templates'
+import { STARTER_TEMPLATES } from '@/features/workflows/starter-templates'
 import {
   createEmptyWorkflow,
   deleteWorkflow,
@@ -56,8 +63,10 @@ export function WorkflowListPage() {
     createMutation.mutate(createEmptyWorkflow('Novo workflow'))
   }
 
-  function handleCreateFromTemplate() {
-    createMutation.mutate(buildVipTicketTemplate())
+  function handleCreateFromTemplate(templateId: string) {
+    const template = STARTER_TEMPLATES.find((entry) => entry.id === templateId)
+    if (!template) return
+    createMutation.mutate(template.build())
   }
 
   function handleDelete(id: string, name: string) {
@@ -92,9 +101,25 @@ export function WorkflowListPage() {
         >
           <Sparkles /> Criar com IA
         </Button>
-        <Button variant="outline" onClick={handleCreateFromTemplate}>
-          <LayoutTemplate /> Começar com o exemplo (ticket VIP)
-        </Button>
+        <Select onValueChange={handleCreateFromTemplate}>
+          <SelectTrigger
+            aria-label="Começar com um exemplo"
+            className="w-auto gap-2"
+          >
+            <LayoutTemplate
+              className="text-muted-foreground size-4"
+              aria-hidden
+            />
+            <SelectValue placeholder="Começar com um exemplo" />
+          </SelectTrigger>
+          <SelectContent>
+            {STARTER_TEMPLATES.map((template) => (
+              <SelectItem key={template.id} value={template.id}>
+                {template.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <CopilotDialog open={copilotOpen} onOpenChange={setCopilotOpen} />
@@ -104,8 +129,7 @@ export function WorkflowListPage() {
           <WorkflowIcon className="text-muted-foreground size-8" aria-hidden />
           <p className="font-medium">Nenhum workflow ainda</p>
           <p className="text-muted-foreground text-sm">
-            Crie um workflow em branco ou comece a partir do exemplo do ticket
-            VIP.
+            Crie um workflow em branco ou comece a partir de um dos exemplos.
           </p>
         </div>
       ) : (
