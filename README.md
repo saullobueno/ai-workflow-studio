@@ -11,7 +11,7 @@ Editor visual para construir workflows de IA (gatilhos → classificação → c
 - Zod para todos os schemas (validação de formulário e do endpoint de IA)
 - Tailwind CSS v4 + shadcn/ui (Radix UI)
 - Monaco Editor (JSON Inspector) e ECharts (estatísticas de execução)
-- Vercel AI SDK + Anthropic Claude (AI Copilot), rodando atrás de uma função serverless
+- Vercel AI SDK + Groq (AI Copilot, tier gratuito), rodando atrás de uma função serverless
 - Vitest + Testing Library (unitário/integração) e Playwright (E2E)
 
 Arquitetura: SPA (Vite) com uma única função serverless (`api/copilot.ts`, padrão Vercel) fazendo proxy da chamada ao provedor de IA — a chave de API nunca chega ao navegador. Não há banco de dados: workflows e histórico de execução ficam no `localStorage`, atrás de uma camada de abstração central. Execução de workflow é sempre simulada (sem integrações reais com Slack/e-mail/etc.).
@@ -21,13 +21,13 @@ Decisões de arquitetura e domínio que não vieram de uma especificação expl�
 ## Pré-requisitos
 
 - Node.js 24+
-- Uma chave de API da Anthropic (opcional para rodar o editor; necessária só para usar o AI Copilot) — veja `.env.example`
+- Uma chave de API da Groq, gratuita e sem cartão de crédito (opcional para rodar o editor; necessária só para usar o AI Copilot) — veja `.env.example`
 
 ## Como rodar
 
 ```bash
 npm install
-cp .env.example .env   # preencha ANTHROPIC_API_KEY se for usar o AI Copilot
+cp .env.example .env   # preencha GROQ_API_KEY se for usar o AI Copilot
 npm run dev
 ```
 
@@ -50,4 +50,4 @@ npm run dev
 
 ## Deploy
 
-Alvo de deploy: [Vercel](https://vercel.com) — a SPA é servida como estático e `api/copilot.ts` roda como Vercel Function (runtime Node.js). Configure `ANTHROPIC_API_KEY` nas variáveis de ambiente do projeto na Vercel.
+Alvo de deploy: [Vercel](https://vercel.com) (plano Hobby, gratuito) — a SPA é servida como estático e `api/copilot.ts` roda como Vercel Function (runtime Node.js). Configure `GROQ_API_KEY` nas variáveis de ambiente do projeto na Vercel.

@@ -9,7 +9,7 @@ O produto é um editor visual de workflows (portfólio). Precisa de um AI Copilo
 ## Decisão
 
 - Frontend: SPA React (Vite), sem framework fullstack (Next.js) e sem backend Node separado.
-- Uma única função serverless (`api/copilot.ts`, padrão Vercel Functions runtime Node.js) faz proxy da chamada ao provedor de IA. É o único lugar do sistema com acesso à `ANTHROPIC_API_KEY`.
+- Uma única função serverless (`api/copilot.ts`, padrão Vercel Functions runtime Node.js) faz proxy da chamada ao provedor de IA. É o único lugar do sistema com acesso à chave de API do provedor (ver ADR [0004](./0004-provedor-ia-gratuito.md) sobre a escolha do provedor gratuito).
 - Sem banco de dados. Workflows e histórico de execução ficam em `localStorage`, atrás de uma camada de abstração central (regra do prompt-base, §9).
 - Execução de workflow é sempre simulada — nenhuma integração real com Slack/e-mail/etc.
 - Gerenciador de pacotes: npm (pnpm não está disponível no ambiente de desenvolvimento).
