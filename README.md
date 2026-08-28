@@ -62,3 +62,11 @@ npm run dev
 ## Deploy
 
 Alvo de deploy: [Vercel](https://vercel.com) (plano Hobby, gratuito) — a SPA é servida como estático e `api/copilot.ts` roda como Vercel Function (runtime Node.js). Configure `GROQ_API_KEY` nas variáveis de ambiente do projeto na Vercel.
+
+## Desenvolvendo com um agente de código
+
+Este repositório tem um workspace de IA completo (`CLAUDE.md`, subagents, skills, hooks e comandos em `.claude/`) — comece por `CLAUDE.md` se for editar o código com um agente.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) roda lint, typecheck, testes unitários (com cobertura), build e testes E2E a cada push/PR.

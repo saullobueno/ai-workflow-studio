@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-destructive-bash.js",
+            "timeout": 10,
+            "statusMessage": "Checando comando quanto a padrões destrutivos…"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/guard-secret-write.js",
+            "timeout": 10,
+            "statusMessage": "Checando se o conteúdo contém um segredo real…"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/suggest-quality-check.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
