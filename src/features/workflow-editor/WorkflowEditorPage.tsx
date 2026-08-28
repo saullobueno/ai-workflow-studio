@@ -1,13 +1,25 @@
-import { ArrowLeft } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, History, Play } from 'lucide-react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { Button } from '@/design/ui/button'
 import { Input } from '@/design/ui/input'
+import { runWorkflow } from '@/features/execution/engine'
+import { saveExecution } from '@/features/execution/execution-repository'
 import { loadWorkflow } from '@/features/workflows/workflow-repository'
 import { NodeConfigPanel } from './NodeConfigPanel'
 import { NodePalette } from './NodePalette'
-import { useWorkflowEditorStore } from './store'
+import { getCurrentWorkflowSnapshot, useWorkflowEditorStore } from './store'
 import { WorkflowCanvas } from './WorkflowCanvas'
+
+// ECharts (gráfico de duração) e o wrapper do Monaco (JSON inspector) só
+// entram no bundle quando o usuário efetivamente abre o histórico.
+const ExecutionHistoryDialog = lazy(() =>
+  import('@/features/execution/ExecutionHistoryDialog').then((module) => ({
+    default: module.ExecutionHistoryDialog,
+  })),
+)
 
 interface WorkflowEditorPageProps {
   workflowId: string
@@ -15,7 +27,13 @@ interface WorkflowEditorPageProps {
 
 export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [historyEverOpened, setHistoryEverOpened] = useState(false)
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(
+    null,
+  )
   const storeWorkflowId = useWorkflowEditorStore((state) => state.workflowId)
   const name = useWorkflowEditorStore((state) => state.name)
   const autosaveStatus = useWorkflowEditorStore((state) => state.autosaveStatus)
@@ -41,6 +59,33 @@ export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
     return null
   }
 
+  function openHistory(executionId: string | null) {
+    setSelectedExecutionId(executionId)
+    setHistoryEverOpened(true)
+    setHistoryOpen(true)
+  }
+
+  function handleRun() {
+    const snapshot = getCurrentWorkflowSnapshot()
+    if (!snapshot) return
+
+    const record = runWorkflow(snapshot)
+    saveExecution(record)
+    void queryClient.invalidateQueries({ queryKey: ['executions', workflowId] })
+
+    openHistory(record.id)
+
+    if (record.status === 'success') {
+      toast.success('Execução simulada concluída', {
+        description: `${String(record.steps.length)} node(s) executado(s).`,
+      })
+    } else {
+      toast.error('Execução simulada terminou com erro', {
+        description: 'Veja o histórico para os detalhes de cada node.',
+      })
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex items-center gap-3 border-b p-3">
@@ -62,9 +107,23 @@ export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
           aria-label="Nome do workflow"
           className="max-w-sm font-medium"
         />
-        <span className="text-muted-foreground ml-auto text-xs" role="status">
+        <span className="text-muted-foreground text-xs" role="status">
           {autosaveStatus === 'saved' ? 'Salvo' : 'Salvando…'}
         </span>
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleRun}>
+            <Play /> Executar
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              openHistory(null)
+            }}
+          >
+            <History /> Histórico
+          </Button>
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
@@ -82,6 +141,18 @@ export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
           />
         )}
       </div>
+
+      {historyEverOpened && (
+        <Suspense fallback={null}>
+          <ExecutionHistoryDialog
+            workflowId={workflowId}
+            open={historyOpen}
+            onOpenChange={setHistoryOpen}
+            selectedExecutionId={selectedExecutionId}
+            onSelectExecution={setSelectedExecutionId}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

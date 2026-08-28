@@ -13,6 +13,20 @@ export type EdgesOrUpdater =
 
 export type AutosaveStatus = 'saved' | 'unsaved'
 
+function buildWorkflowSnapshot(state: EditorState): Workflow | null {
+  if (!state.workflowId || !state.createdAt) return null
+  return {
+    id: state.workflowId,
+    name: state.name,
+    description: state.description,
+    variables: state.variables,
+    nodes: state.nodes,
+    edges: state.edges,
+    createdAt: state.createdAt,
+    updatedAt: new Date().toISOString(),
+  }
+}
+
 interface EditorState {
   workflowId: string | null
   name: string
@@ -163,19 +177,15 @@ useWorkflowEditorStore.subscribe((state, previousState) => {
 
   clearTimeout(autosaveTimeout)
   autosaveTimeout = setTimeout(() => {
-    const current = useWorkflowEditorStore.getState()
-    if (!current.workflowId || !current.createdAt) return
+    const snapshot = buildWorkflowSnapshot(useWorkflowEditorStore.getState())
+    if (!snapshot) return
 
-    saveWorkflow({
-      id: current.workflowId,
-      name: current.name,
-      description: current.description,
-      variables: current.variables,
-      nodes: current.nodes,
-      edges: current.edges,
-      createdAt: current.createdAt,
-      updatedAt: new Date().toISOString(),
-    })
+    saveWorkflow(snapshot)
     useWorkflowEditorStore.setState({ autosaveStatus: 'saved' })
   }, AUTOSAVE_DEBOUNCE_MS)
 })
+
+/** Workflow completo (com as edições em andamento) pronto pra rodar ou exportar. */
+export function getCurrentWorkflowSnapshot(): Workflow | null {
+  return buildWorkflowSnapshot(useWorkflowEditorStore.getState())
+}
