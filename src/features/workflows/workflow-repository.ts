@@ -5,6 +5,7 @@ import {
   removeFromStorage,
   writeToStorage,
 } from '@/core/storage'
+import type { CopilotWorkflowDraft } from '@/schemas/copilot'
 import {
   toWorkflowSummary,
   workflowSchema,
@@ -62,6 +63,17 @@ export function createEmptyWorkflow(name: string): Workflow {
     variables: [],
     nodes: [],
     edges: [],
+    createdAt: now,
+    updatedAt: now,
+  }
+}
+
+/** Completa um rascunho do AI Copilot (sem id/timestamps) para um Workflow persistível. */
+export function createWorkflowFromDraft(draft: CopilotWorkflowDraft): Workflow {
+  const now = new Date().toISOString()
+  return {
+    ...draft,
+    id: nanoid(),
     createdAt: now,
     updatedAt: now,
   }

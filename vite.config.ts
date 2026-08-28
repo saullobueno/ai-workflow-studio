@@ -2,10 +2,11 @@ import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
+import { apiDevPlugin } from './vite.dev-api-plugin.js'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), apiDevPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
@@ -14,6 +15,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    // Alguns testes esperam o primeiro import() dinâmico de chunks pesados
+    // (ECharts/Monaco via ExecutionHistoryDialog) resolver; em máquinas mais
+    // lentas isso passa do padrão de 5s.
+    testTimeout: 20000,
     setupFiles: ['./src/test/setup.ts'],
     css: true,
     coverage: {

@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    // baseUrl é necessário aqui para o path alias @/* funcionar sob
+    // moduleResolution "nodenext" (module: "nodenext") — sob "bundler"
+    // (usado nos outros tsconfig) não precisa. Vai sumir no TS 7; ver ADR 0002.
+    "ignoreDeprecations": "6.0",
     "target": "es2023",
     "lib": ["ES2023"],
     "types": ["node"],
@@ -12,6 +16,12 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+
+    /* Path aliases (vite.dev-api-plugin.ts importa de src/server via @/*) */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     /* Strictness */
     "strict": true,

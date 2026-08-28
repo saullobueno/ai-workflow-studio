@@ -42,7 +42,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['api/**/*.ts'],
+    files: ['api/**/*.ts', 'src/server/**/*.ts'],
     extends: [
       js.configs.recommended,
       ...tseslint.configs.strictTypeChecked,

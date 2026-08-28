@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { workflowEdgeSchema } from './edge'
-import { workflowNodeSchema } from './node'
-import { workflowVariableSchema } from './variable'
+import { workflowEdgeSchema } from './edge.js'
+import { workflowNodeSchema } from './node.js'
+import { workflowVariableSchema } from './variable.js'
 
 export const workflowSchema = z.object({
   id: z.string().min(1),

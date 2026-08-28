@@ -1,22 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Plus, Sparkles, Trash2, Workflow as WorkflowIcon } from 'lucide-react'
+import {
+  LayoutTemplate,
+  Plus,
+  Sparkles,
+  Trash2,
+  Workflow as WorkflowIcon,
+} from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/design/ui/button'
+import { CopilotDialog } from '@/features/copilot/CopilotDialog'
+import { buildVipTicketTemplate } from '@/features/workflows/starter-templates'
 import {
   createEmptyWorkflow,
   deleteWorkflow,
   listWorkflows,
   saveWorkflow,
 } from '@/features/workflows/workflow-repository'
-import { buildVipTicketTemplate } from '@/features/workflows/starter-templates'
 
 const WORKFLOWS_QUERY_KEY = ['workflows'] as const
 
 export function WorkflowListPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [copilotOpen, setCopilotOpen] = useState(false)
 
   const { data: workflows = [] } = useQuery({
     queryKey: WORKFLOWS_QUERY_KEY,
@@ -75,10 +84,20 @@ export function WorkflowListPage() {
         <Button onClick={handleCreateBlank}>
           <Plus /> Novo workflow
         </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setCopilotOpen(true)
+          }}
+        >
+          <Sparkles /> Criar com IA
+        </Button>
         <Button variant="outline" onClick={handleCreateFromTemplate}>
-          <Sparkles /> Começar com o exemplo (ticket VIP)
+          <LayoutTemplate /> Começar com o exemplo (ticket VIP)
         </Button>
       </div>
+
+      <CopilotDialog open={copilotOpen} onOpenChange={setCopilotOpen} />
 
       {workflows.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-12 text-center">

@@ -2,6 +2,17 @@
 
 Editor visual para construir workflows de IA (gatilhos → classificação → condições → ações), inspirado em n8n + React Flow + agentes de IA. Projeto de portfólio focado em demonstrar interfaces altamente interativas, estado complexo, drag & drop e integração de IA — não é um produto real, não há dados nem integrações de verdade por trás.
 
+## Funcionalidades
+
+- Canvas infinito com zoom/pan/minimap (React Flow)
+- 5 tipos de node (gatilho, classificar com IA, condição, loop, ação — com 3 subtipos: Slack/e-mail/criar tarefa), cada um com painel de configuração próprio
+- Paleta de nodes com drag-and-drop nativo e fallback por clique/teclado
+- Undo/redo (com agrupamento de gestos de drag em um único passo)
+- Autosave em `localStorage`
+- Command palette (Ctrl+K) para adicionar nodes e executar ações sem tirar a mão do teclado
+- Execução simulada com histórico, log por node, gráfico de duração e JSON Inspector (Monaco) de entrada/saída de cada passo
+- Templates iniciais (o exemplo do ticket VIP deste README) e AI Copilot: descreva o workflow em português e a IA (Groq, gratuito) monta a estrutura
+
 ## Stack
 
 - React 19 + TypeScript (modo estrito) + Vite

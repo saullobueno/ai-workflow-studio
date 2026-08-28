@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { workflowSchema } from './workflow'
+import { workflowSchema } from './workflow.js'
 
 export const copilotRequestSchema = z.object({
   prompt: z

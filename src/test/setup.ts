@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest'
+import { vi } from 'vitest'
 
 // jsdom não implementa ResizeObserver, mas o @xyflow/react (canvas do
 // editor) instancia um via `new ResizeObserver(...)` para medir os nodes.
@@ -14,3 +15,7 @@ class ResizeObserverMock {
 /* eslint-enable @typescript-eslint/no-empty-function */
 
 globalThis.ResizeObserver = ResizeObserverMock
+
+// jsdom também não implementa scrollIntoView, usado pelo cmdk (command
+// palette) para rolar até o item destacado.
+Element.prototype.scrollIntoView = vi.fn()

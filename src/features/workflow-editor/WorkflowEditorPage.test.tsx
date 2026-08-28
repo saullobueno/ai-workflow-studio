@@ -61,7 +61,7 @@ describe('WorkflowEditorPage', () => {
     // O ExecutionHistoryDialog é carregado via import() dinâmico (para não
     // engordar o bundle do editor com ECharts/Monaco) — a primeira vez que
     // esse chunk é resolvido no ambiente de teste pode passar do timeout padrão.
-    const dialog = await screen.findByRole('dialog', {}, { timeout: 25000 })
+    const dialog = await screen.findByRole('dialog', {}, { timeout: 45000 })
     expect(
       within(dialog).getByText('Histórico de execução'),
     ).toBeInTheDocument()
@@ -70,5 +70,5 @@ describe('WorkflowEditorPage', () => {
     expect(
       within(dialog).getByText('Classificar urgência com IA'),
     ).toBeVisible()
-  }, 30000)
+  }, 50000)
 })
