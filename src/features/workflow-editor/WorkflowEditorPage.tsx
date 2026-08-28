@@ -1,10 +1,13 @@
 import { ArrowLeft } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '@/design/ui/button'
 import { Input } from '@/design/ui/input'
 import { loadWorkflow } from '@/features/workflows/workflow-repository'
+import { NodeConfigPanel } from './NodeConfigPanel'
+import { NodePalette } from './NodePalette'
 import { useWorkflowEditorStore } from './store'
+import { WorkflowCanvas } from './WorkflowCanvas'
 
 interface WorkflowEditorPageProps {
   workflowId: string
@@ -12,6 +15,7 @@ interface WorkflowEditorPageProps {
 
 export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
   const navigate = useNavigate()
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const storeWorkflowId = useWorkflowEditorStore((state) => state.workflowId)
   const name = useWorkflowEditorStore((state) => state.name)
   const autosaveStatus = useWorkflowEditorStore((state) => state.autosaveStatus)
@@ -63,9 +67,20 @@ export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
         </span>
       </header>
 
-      <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-        Canvas do editor ({workflow.nodes.length} nodes, {workflow.edges.length}{' '}
-        edges) — em construção.
+      <div className="flex flex-1 overflow-hidden">
+        <NodePalette />
+        <WorkflowCanvas
+          selectedNodeId={selectedNodeId}
+          onSelectNode={setSelectedNodeId}
+        />
+        {selectedNodeId && (
+          <NodeConfigPanel
+            nodeId={selectedNodeId}
+            onClose={() => {
+              setSelectedNodeId(null)
+            }}
+          />
+        )}
       </div>
     </div>
   )

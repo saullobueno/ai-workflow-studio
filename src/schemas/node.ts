@@ -11,31 +11,37 @@ export type NodeKind = z.infer<typeof nodeKindSchema>
 
 const positionSchema = z.object({ x: z.number(), y: z.number() })
 
-const labelSchema = z
+/**
+ * Nodes ficam persistidos em `localStorage` a cada tecla digitada (autosave
+ * — ver `features/workflow-editor/store.ts`), então um node "pela metade"
+ * (campo de template ainda vazio, por exemplo) tem que continuar sendo um
+ * valor válido para o schema — senão o autosave grava um estado que a
+ * próxima leitura rejeita, e o workflow inteiro "desaparece" silenciosamente.
+ *
+ * Por isso estes schemas são propositalmente permissivos com string vazia.
+ * "Esse node está pronto para rodar?" é responsabilidade do motor de
+ * execução (`features/execution`), não do schema de persistência.
+ */
+const labelSchema = z.string().max(80, 'Máx. 80 caracteres')
+const templateSchema = z.string().max(2000, 'Máx. 2000 caracteres')
+const identifierSchema = z
   .string()
-  .min(1, 'Obrigatório')
-  .max(80, 'Máx. 80 caracteres')
-const templateSchema = z
-  .string()
-  .min(1, 'Obrigatório')
-  .max(2000, 'Máx. 2000 caracteres')
+  .max(60)
+  .refine(
+    (value) => value === '' || /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value),
+    'Use letras, números e "_", começando por uma letra',
+  )
 
 export const triggerFieldSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Obrigatório')
-    .regex(
-      /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-      'Use letras, números e "_", começando por uma letra',
-    ),
-  sampleValue: z.string(),
+  name: identifierSchema,
+  sampleValue: z.string().max(500),
 })
 export type TriggerField = z.infer<typeof triggerFieldSchema>
 
 export const triggerNodeDataSchema = z.object({
   kind: z.literal('trigger'),
   label: labelSchema,
-  eventName: z.string().min(1, 'Obrigatório').max(80),
+  eventName: z.string().max(80),
   fields: z.array(triggerFieldSchema).max(20).default([]),
 })
 export type TriggerNodeData = z.infer<typeof triggerNodeDataSchema>
@@ -49,13 +55,7 @@ export const aiClassifyNodeDataSchema = z.object({
     .array(z.string().min(1).max(40))
     .min(2, 'Defina ao menos 2 categorias')
     .max(8, 'Máx. 8 categorias'),
-  outputVariable: z
-    .string()
-    .min(1, 'Obrigatório')
-    .regex(
-      /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-      'Use letras, números e "_", começando por uma letra',
-    ),
+  outputVariable: identifierSchema,
 })
 export type AiClassifyNodeData = z.infer<typeof aiClassifyNodeDataSchema>
 
@@ -71,7 +71,7 @@ export const conditionNodeDataSchema = z.object({
   label: labelSchema,
   fieldTemplate: templateSchema,
   operator: conditionOperatorSchema,
-  value: z.string().min(1, 'Obrigatório').max(200),
+  value: z.string().max(200),
 })
 export type ConditionNodeData = z.infer<typeof conditionNodeDataSchema>
 
@@ -79,13 +79,7 @@ export const loopNodeDataSchema = z.object({
   kind: z.literal('loop'),
   label: labelSchema,
   listTemplate: templateSchema,
-  itemVariable: z
-    .string()
-    .min(1, 'Obrigatório')
-    .regex(
-      /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-      'Use letras, números e "_", começando por uma letra',
-    ),
+  itemVariable: identifierSchema,
   maxIterations: z.number().int().min(1).max(50).default(10),
 })
 export type LoopNodeData = z.infer<typeof loopNodeDataSchema>
@@ -94,7 +88,7 @@ export const slackActionDataSchema = z.object({
   kind: z.literal('action'),
   actionKind: z.literal('slack'),
   label: labelSchema,
-  channel: z.string().min(1, 'Obrigatório').max(80),
+  channel: z.string().max(80),
   message: templateSchema,
 })
 export type SlackActionData = z.infer<typeof slackActionDataSchema>

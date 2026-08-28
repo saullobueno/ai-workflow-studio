@@ -5,7 +5,9 @@ import { workflowVariableSchema } from './variable'
 
 export const workflowSchema = z.object({
   id: z.string().min(1),
-  name: z.string().min(1, 'Obrigatório').max(120, 'Máx. 120 caracteres'),
+  // Permissivo com string vazia: o nome é editado por um <input> ligado
+  // direto ao autosave (ver schemas/node.ts para o motivo completo).
+  name: z.string().max(120, 'Máx. 120 caracteres'),
   description: z.string().max(500).default(''),
   variables: z.array(workflowVariableSchema).max(50).default([]),
   nodes: z.array(workflowNodeSchema).max(200).default([]),
