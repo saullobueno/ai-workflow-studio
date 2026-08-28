@@ -13,7 +13,8 @@ import {
   type CopilotResponse,
 } from '../schemas/copilot.js'
 
-const GROQ_MODEL = 'llama-3.3-70b-versatile'
+// llama-3.3-70b-versatile foi descontinuado pela Groq (ver ADR 0008).
+const GROQ_MODEL = 'openai/gpt-oss-120b'
 
 export class CopilotError extends Error {
   status: number
@@ -76,9 +77,19 @@ export async function handleCopilotRequest(
       system: SYSTEM_PROMPT,
       prompt: parsedRequest.data.prompt,
       output: Output.object({ schema: copilotWorkflowDraftSchema }),
+      // strictJsonSchema:false é necessário porque nosso schema tem campos
+      // opcionais/com default (ex.: edges[].label, trigger.fields) — no modo
+      // estrito da Groq (OpenAI-compatible), TODO campo do JSON Schema
+      // precisa estar em `required`, inclusive os opcionais. Sem isso a
+      // chamada falha com 400 antes mesmo de gerar qualquer coisa. Ver ADR 0008.
+      providerOptions: { groq: { strictJsonSchema: false } },
     })
     generated = { workflow: result.output }
   } catch (error) {
+    // Só sai no log do servidor, nunca na resposta ao cliente — ajuda a
+    // diagnosticar falhas reais do provedor (ex.: modelo descontinuado,
+    // JSON Schema rejeitado) sem precisar reproduzir o erro às cegas.
+    console.error('[copilot-handler] erro na chamada ao provedor de IA:', error)
     if (error instanceof NoOutputGeneratedError) {
       throw new CopilotError(
         'Não foi possível gerar o workflow',
