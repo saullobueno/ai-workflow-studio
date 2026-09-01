@@ -2,6 +2,29 @@
 
 Editor visual para construir workflows de IA (gatilhos → classificação → condições → ações), inspirado em n8n + React Flow + agentes de IA. Projeto de portfólio focado em demonstrar interfaces altamente interativas, estado complexo, drag & drop e integração de IA — não é um produto real, não há dados nem integrações de verdade por trás.
 
+## Veja funcionando
+
+**Demo ao vivo:** [ai-workflow-studio-phi.vercel.app](https://ai-workflow-studio-phi.vercel.app/)
+
+### Roteiro de 3 minutos
+
+1. **Tela inicial** — escolha um dos 5 exemplos no seletor "Começar com um exemplo" (ou crie um workflow em branco).
+2. **Canvas do editor** — arraste um node novo da paleta lateral até o canvas, conecte-o a um node existente e clique nele para abrir o painel de configuração.
+3. **Command palette** — abra com `Ctrl+K`/`⌘K`, adicione um node por ali e desfaça/refaça a alteração (undo/redo vive na própria palette, sem tirar a mão do teclado).
+4. **Executar** — rode o workflow simulado e explore o histórico: log por node, gráfico de duração (ECharts) e o JSON Inspector (Monaco) de entrada/saída de cada passo.
+5. **AI Copilot** — descreva um workflow em português (ex.: "Quando um cliente cancela, notifica o time no Slack") e veja a IA montar a estrutura sozinha.
+
+### Sinais técnicos que o projeto demonstra
+
+- **Estado complexo de UI**: canvas do React Flow orquestrado com Zustand + `zundo`, incluindo agrupamento de gestos de drag inteiros em um único passo de undo/redo.
+- **Validação como fonte única de verdade**: todos os schemas em Zod, compartilhados entre o app e a função serverless — o mesmo schema valida formulário, autosave e a saída estruturada da IA.
+- **Interação acessível**: drag-and-drop com fallback completo por clique/teclado e command palette navegável sem mouse.
+- **Integração de IA com geração estruturada**: Vercel AI SDK + Groq (tier gratuito) atrás de uma única função serverless — a chave de API nunca chega ao navegador, e a saída é forçada a bater com o schema Zod do domínio.
+- **Motor de execução simulado e observável**: log por node, visualização de duração (ECharts) e inspeção de payload (Monaco), sem depender de nenhuma integração real por trás.
+- **Disciplina de qualidade**: TypeScript em modo estrito, Vitest + Testing Library, Playwright E2E e CI (GitHub Actions) rodando tudo a cada push.
+- **Arquitetura documentada**: decisões não óbvias registradas como ADRs em [`docs/decisions/`](./docs/decisions/), não perdidas em histórico de chat.
+- **Zero custo operacional**: SPA estática + 1 função serverless, tudo em planos gratuitos (Vercel Hobby, Groq free tier) — sem banco de dados, sem infraestrutura própria.
+
 ## Funcionalidades
 
 - Canvas infinito com zoom/pan/minimap (React Flow)
