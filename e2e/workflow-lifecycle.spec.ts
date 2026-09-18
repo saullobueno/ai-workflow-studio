@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
+  // Credenciais de demonstração já vêm preenchidas nos campos.
+  await page.getByRole('button', { name: /^entrar$/i }).click()
+  await expect(page).toHaveURL('/')
 })
 
 test('cria o workflow de exemplo, executa e vê o histórico', async ({

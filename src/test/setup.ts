@@ -25,3 +25,17 @@ Element.prototype.scrollIntoView = vi.fn()
 Element.prototype.hasPointerCapture = vi.fn(() => false)
 Element.prototype.setPointerCapture = vi.fn()
 Element.prototype.releasePointerCapture = vi.fn()
+
+// jsdom também não implementa window.matchMedia, usado por
+// `features/theme/theme-storage.ts` pra detectar a preferência de tema do
+// sistema operacional quando o usuário nunca escolheu um.
+window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+}))

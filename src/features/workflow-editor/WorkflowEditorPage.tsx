@@ -7,6 +7,7 @@ import { Button } from '@/design/ui/button'
 import { Input } from '@/design/ui/input'
 import { runWorkflow } from '@/features/execution/engine'
 import { saveExecution } from '@/features/execution/execution-repository'
+import { ThemeToggle } from '@/features/theme/ThemeToggle'
 import { loadWorkflow } from '@/features/workflows/workflow-repository'
 import { CommandPalette } from './CommandPalette'
 import { NodeConfigPanel } from './NodeConfigPanel'
@@ -135,6 +136,7 @@ export function WorkflowEditorPage({ workflowId }: WorkflowEditorPageProps) {
           >
             <History /> Histórico
           </Button>
+          <ThemeToggle />
         </div>
       </header>
 

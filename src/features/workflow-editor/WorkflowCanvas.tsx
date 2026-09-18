@@ -17,6 +17,7 @@ import { nanoid } from 'nanoid'
 import { useCallback, type DragEvent } from 'react'
 import type { WorkflowEdge } from '@/schemas/edge'
 import type { NodeKind, WorkflowNode } from '@/schemas/node'
+import { useTheme } from '@/features/theme/use-theme'
 import { NODE_KIND_ORDER, createNode } from './node-kinds'
 import { NODE_KIND_DATA_TRANSFER_TYPE } from './NodePalette'
 import { nodeTypes } from './nodes/node-types'
@@ -41,6 +42,7 @@ function WorkflowCanvasInner({
   const setEdges = useWorkflowEditorStore((state) => state.setEdges)
   const addNode = useWorkflowEditorStore((state) => state.addNode)
   const { screenToFlowPosition } = useReactFlow()
+  const { theme } = useTheme()
 
   const onNodesChange = useCallback(
     (changes: NodeChange<WorkflowNode>[]) => {
@@ -115,11 +117,27 @@ function WorkflowCanvasInner({
         onPaneClick={() => {
           onSelectNode(null)
         }}
+        // @xyflow/react só aplica seu próprio tema escuro (minimap, controles,
+        // handles) com a classe "dark" no elemento .react-flow em si — ser
+        // descendente de <html class="dark"> não é suficiente (ver style.css
+        // da lib: seletor é `.react-flow.dark`, não `.dark .react-flow`).
+        className={theme === 'dark' ? 'dark' : undefined}
         fitView
       >
         <Background />
         <Controls />
-        <MiniMap pannable zoomable />
+        <MiniMap
+          pannable
+          zoomable
+          // A classe "dark" no .react-flow (acima) cobre o resto do tema
+          // nativo (controles, handles), mas o fundo/nodes do minimap ficam
+          // brancos mesmo assim se não vierem via prop — cores literais
+          // (não tokens oklch/var(), que o SVG do minimap não resolve),
+          // mesmo caso já documentado em ExecutionDurationChart.tsx.
+          bgColor={theme === 'dark' ? '#27272a' : undefined}
+          maskColor={theme === 'dark' ? 'rgba(9, 9, 11, 0.6)' : undefined}
+          nodeColor={theme === 'dark' ? '#71717a' : undefined}
+        />
       </ReactFlow>
     </div>
   )

@@ -3,6 +3,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
   LayoutTemplate,
+  LogOut,
   Plus,
   Sparkles,
   Trash2,
@@ -18,7 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/design/ui/select'
+import { logout } from '@/features/auth/auth-storage'
 import { CopilotDialog } from '@/features/copilot/CopilotDialog'
+import { ThemeToggle } from '@/features/theme/ThemeToggle'
 import { STARTER_TEMPLATES } from '@/features/workflows/starter-templates'
 import {
   createEmptyWorkflow,
@@ -81,12 +84,28 @@ export function WorkflowListPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 p-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">AI Workflow Studio</h1>
-        <p className="text-muted-foreground text-sm">
-          Editor visual para construir workflows de IA — gatilhos,
-          classificação, condições e ações.
-        </p>
+      <header className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold">AI Workflow Studio</h1>
+          <p className="text-muted-foreground text-sm">
+            Editor visual para construir workflows de IA — gatilhos,
+            classificação, condições e ações.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Sair"
+            onClick={() => {
+              logout()
+              void navigate('/login', { replace: true })
+            }}
+          >
+            <LogOut />
+          </Button>
+        </div>
       </header>
 
       <div className="flex flex-wrap gap-3">

@@ -8,13 +8,13 @@ describe('App', () => {
     window.history.pushState({}, '', '/')
   })
 
-  it('renderiza a lista de workflows na rota inicial', async () => {
+  it('sem sessão, redireciona a rota inicial para o login', async () => {
     render(<App />)
     expect(
       await screen.findByRole('heading', { name: 'AI Workflow Studio' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /novo workflow/i }),
+      screen.getByRole('button', { name: /^entrar$/i }),
     ).toBeInTheDocument()
   })
 })
